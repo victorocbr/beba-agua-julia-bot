@@ -1,10 +1,19 @@
-require('dotenv').config();
 const TelegramBot = require('node-telegram-bot-api');
 const { findInitialMessage } = require('./data/firebase.service');
 const sheduleMessages = require('./util/shedule-messages');
-const { TOKEN } = process.env;
+const token = process.env.TOKEN;
 
-const bot = new TelegramBot(TOKEN, { polling: true });
+let bot;
+
+if (process.env.NODE_ENV === 'production') {
+    bot = new TelegramBot(token);
+    bot.setWebHook(process.env.HEROKU_URL + bot.token);
+}
+else {
+    bot = new TelegramBot(token, { polling: true });
+}
+
+console.log(`Bot server started in the ${process.env.NODE_ENV} mode`);
 
 bot.onText(/\/start/, async (msg) => {
     const chatId = msg.from.id;
@@ -14,3 +23,5 @@ bot.onText(/\/start/, async (msg) => {
 
     sheduleMessages(bot.sendMessage.bind(bot, chatId));
 });
+
+module.exports = bot;
