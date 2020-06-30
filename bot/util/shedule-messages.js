@@ -10,7 +10,7 @@ module.exports = async (sender) => {
 
     cronTimes.forEach(cronTime => new CronJob({
         cronTime,
-        onTick: () => sender(messages[moment().format('HH:mm')]),
+        onTick: () => sender(messages[moment().format('HH:mm')] || messages['error']),
         onComplete: null,
         start: true,
         timeZone: 'America/Sao_Paulo'
